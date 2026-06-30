@@ -52,3 +52,54 @@ const MyStore = new Soapstone<MyStore, [string, number]>((name, age) => {
   };
 });
 ```
+
+### Subscribing
+
+In any React component, use the `use` method to reactively subscribe to the store:
+
+```tsx
+function MyComponent() {
+  const store = MyStore.use();
+
+  return (
+    <span>
+      {store.user.name} is {store.user.age} years old
+    </span>
+  );
+}
+```
+
+However, using the `use` method without any arguments will subscribe you to the entire store, causing re-renders on every state change, anywhere in the tree. It's smarter to subscribe to a smaller, more relevant slice(s) of the store, causing re-renders on when the relevant values are changed:
+
+```tsx
+function MyComponent() {
+  const name = MyStore.use((store) => store.user.name);
+  const age = MyStore.use((store) => store.user.age);
+
+  return (
+    <span>
+      {name} is {age} years old
+    </span>
+  );
+}
+```
+
+> [!NOTE]
+> You must initialize the store before using it if you passed a function for the initial state.
+
+Make sure you initialize the store before using any of its methods if you did not pass a fully resolved state on creation:
+
+```tsx
+function MyComponent() {
+  MyStore.useInitialization("TrèsAbhi", 21);
+
+  const name = MyStore.use((store) => store.user.name);
+  const age = MyStore.use((store) => store.user.age);
+
+  return (
+    <span>
+      {name} is {age} years old
+    </span>
+  );
+}
+```

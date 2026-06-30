@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { debounce, merge } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 
-export class Soapstone<Type, Arguments> {
+export class Soapstone<Type, Arguments extends unknown[]> {
   private listeners = new Set<(state: Type) => void>();
 
   private initialized = false;
@@ -35,7 +35,7 @@ export class Soapstone<Type, Arguments> {
     this._state = data;
   }
 
-  useInitialization(...args: Arguments[]) {
+  useInitialization(...args: Arguments) {
     const initializedThisMount = useRef(false);
 
     if (initializedThisMount.current) return;
@@ -44,7 +44,7 @@ export class Soapstone<Type, Arguments> {
       throw new Error("Provider must be used with a function creator");
     }
 
-    this.initialize((this.creator as (...args: Arguments[]) => Type)(...args));
+    this.initialize((this.creator as (...args: Arguments) => Type)(...args));
     initializedThisMount.current = true;
   }
 
