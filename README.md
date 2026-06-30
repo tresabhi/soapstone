@@ -53,6 +53,8 @@ const MyStore = new Soapstone<MyStore, [string, number]>((name, age) => {
 });
 ```
 
+TODO: talk about persistence
+
 ### Subscribing
 
 In any React component, use the `use` method to reactively subscribe to the store:
@@ -101,5 +103,26 @@ function MyComponent() {
       {name} is {age} years old
     </span>
   );
+}
+```
+
+Initialization, as shown above, may cause issues with server-side rendering where the server and client disagree on the initialized states, in case the client knows more than the server, like `localStorage`. The `useDeferred` method can be used to render something consistent across the server and client, and letting the client override the state upon mount:
+
+```tsx
+interface MyStore {
+  name: string;
+}
+
+const MyStore = new Soapstone<MyStore>({
+  name: localStorage.getItem("name")!,
+});
+
+function MyComponent() {
+  const name = MyStore.useDeferred(
+    (store) => store.name,
+    "This will render on the server (and client for a brief moment)",
+  );
+
+  return <span>{name} says hello!</span>;
 }
 ```

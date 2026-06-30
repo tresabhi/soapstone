@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { debounce, merge } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 
-export class Soapstone<Type, Arguments extends unknown[]> {
+export class Soapstone<Type, Arguments extends unknown[] = []> {
   private listeners = new Set<(state: Type) => void>();
 
   private initialized = false;
