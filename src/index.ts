@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { debounce, merge } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 
-export class Varuna<Type, Arguments = void> {
+export class Soapstone<Type, Arguments> {
   private listeners = new Set<(state: Type) => void>();
 
   private initialized = false;
@@ -10,7 +10,7 @@ export class Varuna<Type, Arguments = void> {
   private _state?: Type;
 
   constructor(
-    private creator: Type | ((...args: Arguments[]) => Type),
+    private creator: Type | ((...args: Arguments) => Type),
     private persistence?: string,
   ) {
     if (typeof creator !== "function") this.initialize(creator);
