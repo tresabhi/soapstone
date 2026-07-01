@@ -41,7 +41,9 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
     if (initializedThisMount.current) return;
 
     if (typeof this.creator !== "function") {
-      throw new Error("Provider must be used with a function creator");
+      throw new Error(
+        `Can't initialize ${this.constructor.name} because it doesn't have a functional initial state`,
+      );
     }
 
     this.initialize((this.creator as (...args: Arguments) => Type)(...args));
@@ -78,7 +80,7 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
 
   private assertInitialized() {
     if (!this.initialized) {
-      throw new Error("Varuna store used before initialization");
+      throw new Error(`${this.constructor.name} used before initialization`);
     }
   }
 
@@ -118,8 +120,12 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
   }
 
   store() {
-    localStorage.setItem(this.persistence!, JSON.stringify(this.state));
+    if (this.persistence === undefined) {
+      throw new Error(`${this.constructor.name} is not persistent`);
+    }
+
+    localStorage.setItem(this.persistence, JSON.stringify(this.state));
   }
 
-  storeDeferred = debounce(this.store.bind(this), 500);
+  private storeDeferred = debounce(this.store.bind(this), 2000);
 }

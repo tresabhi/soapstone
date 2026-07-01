@@ -22,29 +22,13 @@ const MyStore = new Soapstone<MyStore>(
 );
 
 function MyComponent() {
-  const name = MyStore.use((state) => state.user.name);
-  const age = MyStore.use((state) => state.user.age);
-
   return (
-    <div>
-      <span>
-        {name} is {age} years old
-      </span>
-
-      <button
-        onClick={() => {
-          MyStore.mutate((draft) => {
-            draft.user.age++;
-          });
-        }}
-      >
-        Older!
-      </button>
-    </div>
+    <button
+      onClick={() => {
+        MyStore.store();
+      }}
+    >
+      Save
+    </button>
   );
 }
-
-MyStore.set({
-  user: { age: 99, name: "Dead Doe" },
-  todos: [],
-});

@@ -124,7 +124,7 @@ MyStore.set({
 > [!WARNING]
 > The `set` method does not guarantee immutability as that is up to you. Depending on how you maintain immutability, certain subscriptions and reactivities won't trigger a re-render if you do not recreate relevant objects.
 
-## Feature: Persistence
+## Persistence
 
 If you would like your store to persist across page reloads, you can pass in a unique identifier which will be used to save your state to local storage:
 
@@ -137,6 +137,29 @@ const MyStore = new Soapstone<MyStore>(
 
 > [!WARNING]
 > This hydration with local data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
+
+Soapstone is pretty good at saving the state of your store to local storage whenever necessary. It saves under the following situations (some methods are debounced by $2000\text{ms}$):
+
+- When `beforeunload` is fired
+- When `set` is called (debounced)
+- When `mutate` is used (debounced)
+- When `store` is called
+
+If that isn't enough for you, you can always use the `store` method to save your state immediately:
+
+```tsx
+function MyComponent() {
+  return (
+    <button
+      onClick={() => {
+        MyStore.store();
+      }}
+    >
+      Save
+    </button>
+  );
+}
+```
 
 ## Uninitialized Stores
 
@@ -198,6 +221,14 @@ You can unsubscribe whenever you please using the returned function from the `on
 
 ```ts
 unsubscribeName();
+```
+
+## Current State
+
+If you don't have access to the state of the store in a component, or are outside of the realm of React entirely, you can use the `state` property to get the current state of the store:
+
+```ts
+console.log("Current state:", MyStore.state);
 ```
 
 ## Initial State
