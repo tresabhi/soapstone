@@ -1,5 +1,0 @@
----
-"soapstone": major
----
-
-created soapstone
