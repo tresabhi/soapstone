@@ -107,6 +107,23 @@ function MyComponent() {
 >
 > In the example above, changing `age` causes both the root object and `user` to be recreated. This means that updating `user.age` also creates a new `user` object reference, which triggers re-renders in any components subscribed to `use((state) => state.user)`.
 
+## Setting the Store
+
+If you would like a more hands-on way to modifying the data of the store, you can use the `set` method:
+
+```
+MyStore.set({
+  user: { age: 99, name: "Dead Doe" },
+  todos: [],
+});
+```
+
+> [!NOTE]
+> You must pass a fully complete tree to the `set` method. Soapstone will not handle automatically merging your partial state with the current one.
+
+> [!WARNING]
+> The `set` method does not guarantee immutability as that is up to you. Depending on how you maintain immutability, certain subscriptions and reactivities won't trigger a re-render if you do not recreate relevant objects.
+
 ## Feature: Persistence
 
 If you would like your store to persist across page reloads, you can pass in a unique identifier which will be used to save your state to local storage:
@@ -188,5 +205,5 @@ unsubscribeName();
 The initial state of a store is made accessible to you via the `initial` property:
 
 ```ts
-console.log(MyStore.initial);
+console.log("This was the initial state:", MyStore.initial);
 ```

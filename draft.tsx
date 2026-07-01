@@ -44,11 +44,7 @@ function MyComponent() {
   );
 }
 
-const unsubscribeName = MyStore.on(
-  (state) => state.user.name,
-  (name) => {
-    console.log(`Name is now ${name}!`);
-  },
-);
-
-unsubscribeName();
+MyStore.set({
+  user: { age: 99, name: "Dead Doe" },
+  todos: [],
+});
