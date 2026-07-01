@@ -1,4 +1,4 @@
-# Soapstone <img src="https://i.imgur.com/558wF8f.png" alt="Verne Logo" width="90" height="90" align="right">
+# Soapstone <img src="https://i.imgur.com/558wF8f.png" width="90" height="90" align="right">
 
 A bare bones React state manager.
 
@@ -121,7 +121,7 @@ const MyStore = new Soapstone<MyStore>(
 > [!WARNING]
 > This hydration with local data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
 
-## Advanced: Uninitialized Stores
+## Uninitialized Stores
 
 If you don't have enough data to create your initial state, you can pass a function that you can initialize later with the `useInitialization` hook:
 
@@ -146,7 +146,7 @@ function MyComponent() {
 > [!WARNING]
 > This hydration with locally fetched data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
 
-## Advanced: Deferred Hydration
+## Deferred Hook
 
 Sometimes, you may desire the server and client to agree on the same initial state, just for the client to override it upon mount. You can achieve this with the `useDeferred` which returns a dummy value, consistent across the server and client, and overrides it when the component mounts, only on the client:
 
@@ -162,4 +162,31 @@ function MyComponent() {
 
   return <span>{name} says hello!</span>;
 }
+```
+
+## Subscribing
+
+If reactivity doesn't tickle your fancy and you need a more traditional subscription-based/event-style system, you can use the `on` method:
+
+```ts
+const unsubscribeName = MyStore.on(
+  (state) => state.user.name,
+  (name) => {
+    console.log(`Name is now ${name}!`);
+  },
+);
+```
+
+You can unsubscribe whenever you please using the returned function from the `on` method:
+
+```ts
+unsubscribeName();
+```
+
+## Initial State
+
+The initial state of a store is made accessible to you via the `initial` property:
+
+```ts
+console.log(MyStore.initial);
 ```

@@ -43,3 +43,12 @@ function MyComponent() {
     </div>
   );
 }
+
+const unsubscribeName = MyStore.on(
+  (state) => state.user.name,
+  (name) => {
+    console.log(`Name is now ${name}!`);
+  },
+);
+
+unsubscribeName();
