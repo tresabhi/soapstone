@@ -16,10 +16,12 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
     if (typeof creator !== "function") this.initialize(creator);
   }
 
+  private handleBeforeUnload = this.store.bind(this);
+
   private initialize(initial: Type) {
     let data = initial;
 
-    if (this.persistence && typeof localStorage !== "undefined") {
+    if (this.persistence !== undefined && typeof window !== "undefined") {
       const dehydrated = localStorage.getItem(this.persistence);
 
       if (dehydrated) {
@@ -27,7 +29,7 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
         data = merge(data, rehydrated);
       }
 
-      window.addEventListener("beforeunload", this.store.bind(this));
+      window.addEventListener("beforeunload", this.handleBeforeUnload);
     }
 
     this.initialized = true;
