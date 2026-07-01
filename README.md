@@ -183,6 +183,9 @@ function MyComponent() {
 }
 ```
 
+> [!NOTE]
+> Calling `useInitialization` only works once and all subsequent calls will be ignored.
+
 > [!WARNING]
 > This hydration with locally fetched data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
 
