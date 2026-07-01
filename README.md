@@ -14,7 +14,7 @@ So, I present Soapstone to you. Atomic? Hook-based? I have no idea, but it's got
 npm install soapstone
 ```
 
-## Usage
+## Creating a Store
 
 Start by declaring the state of your store:
 
@@ -34,28 +34,15 @@ Then pass your type into an instance of the `Soapstone` class, while giving it a
 ```ts
 const MyStore = new Soapstone<MyStore>({
   user: {
-    name: "TrèsAbhi",
-    age: 21,
+    name: "John Doe",
+    age: 22,
   },
 
   todos: [],
 });
 ```
 
-If you aren't sure what your initial state will be, you can pass a function that you can initialize with later (make sure you pass the types for the function arguments):
-
-```ts
-const MyStore = new Soapstone<MyStore, [string, number]>((name, age) => {
-  return {
-    user: { name, age },
-    todos: [],
-  };
-});
-```
-
-TODO: talk about persistence
-
-### Subscribing
+## Using the Store
 
 In any React component, use the `use` method to reactively subscribe to the store:
 
@@ -75,53 +62,103 @@ However, using the `use` method without any arguments will subscribe you to the 
 
 ```tsx
 function MyComponent() {
-  const name = MyStore.use((store) => store.user.name);
-  const age = MyStore.use((store) => store.user.age);
+  const name = MyStore.use((state) => state.user.name);
+  const age = MyStore.use((state) => state.user.age);
 
   return (
     <span>
       {name} is {age} years old
     </span>
+  );
+}
+```
+
+## Mutating the Store
+
+Use the `mutate` method to update the store's state:
+
+```tsx
+function MyComponent() {
+  const name = MyStore.use((state) => state.user.name);
+  const age = MyStore.use((state) => state.user.age);
+
+  return (
+    <div>
+      <span>
+        {name} is {age} years old
+      </span>
+
+      <button
+        onClick={() => {
+          MyStore.mutate((draft) => {
+            draft.user.age++;
+          });
+        }}
+      >
+        Older!
+      </button>
+    </div>
   );
 }
 ```
 
 > [!NOTE]
-> You must initialize the store before using it if you passed a function for the initial state.
+> Soapstone uses Immer internally to manage state updates while preserving immutability.
+>
+> In the example above, changing `age` causes both the root object and `user` to be recreated. This means that updating `user.age` also creates a new `user` object reference, which triggers re-renders in any components subscribed to `use((state) => state.user)`.
 
-Make sure you initialize the store before using any of its methods if you did not pass a fully resolved state on creation:
+## Feature: Persistence
+
+If you would like your store to persist across page reloads, you can pass in a unique identifier which will be used to save your state to local storage:
+
+```ts
+const MyStore = new Soapstone<MyStore>(
+  { ... },
+  "my-store",
+);
+```
+
+> [!WARNING]
+> This hydration with local data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
+
+## Advanced: Uninitialized Stores
+
+If you don't have enough data to create your initial state, you can pass a function that you can initialize later with the `useInitialization` hook:
+
+```ts
+const MyStore = new Soapstone<MyStore, [string, number]>((name, age) => {
+  return {
+    user: { name, age },
+    todos: [],
+  };
+});
+```
+
+You must initialize the store before using any of its methods:
 
 ```tsx
 function MyComponent() {
-  MyStore.useInitialization("TrèsAbhi", 21);
-
-  const name = MyStore.use((store) => store.user.name);
-  const age = MyStore.use((store) => store.user.age);
-
-  return (
-    <span>
-      {name} is {age} years old
-    </span>
-  );
+  MyStore.useInitialization(api.getName(), api.getAge());
+  ...
 }
 ```
 
-Initialization, as shown above, may cause issues with server-side rendering where the server and client disagree on the initialized states, in case the client knows more than the server, like `localStorage`. The `useDeferred` method can be used to render something consistent across the server and client, and letting the client override the state upon mount:
+> [!WARNING]
+> This hydration with locally fetched data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
+
+## Advanced: Deferred Hydration
+
+Sometimes, you may desire the server and client to agree on the same initial state, just for the client to override it upon mount. You can achieve this with the `useDeferred` which returns a dummy value, consistent across the server and client, and overrides it when the component mounts, only on the client:
 
 ```tsx
 interface MyStore {
   name: string;
 }
 
-const MyStore = new Soapstone<MyStore>({
-  name: localStorage.getItem("name")!,
-});
+const MyStore = new Soapstone<MyStore>({ ... }, "my-store");
 
 function MyComponent() {
-  const name = MyStore.useDeferred(
-    (store) => store.name,
-    "This will render on the server (and client for a brief moment)",
-  );
+  const name = MyStore.useDeferred((state) => state.name, "Dummy Name");
 
   return <span>{name} says hello!</span>;
 }

@@ -1,18 +1,45 @@
 import { Soapstone } from "./src";
 
 interface MyStore {
-  name: string;
+  user: {
+    name: string;
+    age: number;
+  };
+
+  todos: string[];
 }
 
-const MyStore = new Soapstone<MyStore>({
-  name: localStorage.getItem("name")!,
-});
+const MyStore = new Soapstone<MyStore>(
+  {
+    user: {
+      name: "John Doe",
+      age: 22,
+    },
+
+    todos: [],
+  },
+  "my-store",
+);
 
 function MyComponent() {
-  const name = MyStore.useDeferred(
-    (store) => store.name,
-    "This will render on the server",
-  );
+  const name = MyStore.use((state) => state.user.name);
+  const age = MyStore.use((state) => state.user.age);
 
-  return <span>{name} says hello!</span>;
+  return (
+    <div>
+      <span>
+        {name} is {age} years old
+      </span>
+
+      <button
+        onClick={() => {
+          MyStore.mutate((draft) => {
+            draft.user.age++;
+          });
+        }}
+      >
+        Older!
+      </button>
+    </div>
+  );
 }
