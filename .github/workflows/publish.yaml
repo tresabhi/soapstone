@@ -22,7 +22,7 @@ jobs:
       - run: bun install
       - name: Changesets
         id: changesets
-        uses: changesets/action@v2
+        uses: changesets/action@v1
         with:
           publish: bun run release
         env:
