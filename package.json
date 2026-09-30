@@ -13,6 +13,10 @@
     "react",
     "state"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "release": "bun run build && changeset publish",
