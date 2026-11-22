@@ -166,9 +166,9 @@ function MyComponent() {
 If you don't have enough data to create your initial state, you can pass a function that you can initialize later with the `useInitialization` hook:
 
 ```ts
-const MyStore = new Soapstone<MyStore, [string, number]>((name, age) => {
+const MyStore = new Soapstone<MyStore, User>((user) => {
   return {
-    user: { name, age },
+    user,
     todos: [],
   };
 });
@@ -178,13 +178,15 @@ You must initialize the store before using any of its methods:
 
 ```tsx
 function MyComponent() {
-  MyStore.useInitialization(api.getName(), api.getAge());
+  MyStore.useInitialization(() => api.getUser());
   ...
 }
 ```
 
+The creator receives a context, the data it needs to build the initial state. The context is passed to `useInitialization` as a function, so it's only computed if the store actually needs initializing.
+
 > [!NOTE]
-> Calling `useInitialization` only works once and all subsequent calls will be ignored.
+> Only the first call to `useInitialization` across the whole app initializes the store. All later calls, even from other components, are ignored and their function is never called.
 
 > [!WARNING]
 > This hydration with locally fetched data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.

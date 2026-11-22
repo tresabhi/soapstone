@@ -1,8 +1,8 @@
 import { produce } from "immer";
 import { debounce, merge } from "lodash-es";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-export class Soapstone<Type, Arguments extends unknown[] = []> {
+export class Soapstone<Type, Context = void> {
   private listeners = new Set<(state: Type) => void>();
 
   private initialized = false;
@@ -10,7 +10,7 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
   private _state?: Type;
 
   constructor(
-    private creator: Type | ((...args: Arguments) => Type),
+    private creator: Type | ((context: Context) => Type),
     private persistence?: string,
   ) {
     if (typeof creator !== "function") this.initialize(creator);
@@ -37,19 +37,18 @@ export class Soapstone<Type, Arguments extends unknown[] = []> {
     this._state = data;
   }
 
-  useInitialization(...args: Arguments) {
-    const initializedThisMount = useRef(false);
-
-    if (initializedThisMount.current) return;
-
+  // the context is lazy so it's never computed once the store is initialized
+  useInitialization(getContext: () => Context) {
     if (typeof this.creator !== "function") {
       throw new Error(
         `Can't initialize ${this.constructor.name} because it doesn't have a functional initial state`,
       );
     }
 
-    this.initialize((this.creator as (...args: Arguments) => Type)(...args));
-    initializedThisMount.current = true;
+    if (this.initialized) return;
+
+    const context = getContext();
+    this.initialize((this.creator as (context: Context) => Type)(context));
   }
 
   private dispatch() {
