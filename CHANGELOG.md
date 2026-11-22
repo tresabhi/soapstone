@@ -1,5 +1,11 @@
 # soapstone
 
+## 1.1.0
+
+### Minor Changes
+
+- 218cf51: Add functional context creators instead of argument passing
+
 ## 1.0.1
 
 ### Patch Changes
