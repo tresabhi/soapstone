@@ -38,14 +38,15 @@ export class Soapstone<Type, Context = void> {
   }
 
   // the context is lazy so it's never computed once the store is initialized
-  useInitialization(getContext: () => Context) {
+  // unless override is set, which reinitializes it every call
+  useInitialization(getContext: () => Context, override = false) {
     if (typeof this.creator !== "function") {
       throw new Error(
         `Can't initialize ${this.constructor.name} because it doesn't have a functional initial state`,
       );
     }
 
-    if (this.initialized) return;
+    if (this.initialized && !override) return;
 
     const context = getContext();
     this.initialize((this.creator as (context: Context) => Type)(context));

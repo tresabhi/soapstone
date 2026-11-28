@@ -188,6 +188,12 @@ The creator receives a context, the data it needs to build the initial state. Th
 > [!NOTE]
 > Only the first call to `useInitialization` across the whole app initializes the store. All later calls, even from other components, are ignored and their function is never called.
 
+Pass `true` as the second argument to reinitialize the store even if it was already initialized. This is useful during server-side rendering, where one store is shared across every page rendered by the same process:
+
+```tsx
+MyStore.useInitialization(() => api.getUser(), import.meta.env.SSR);
+```
+
 > [!WARNING]
 > This hydration with locally fetched data may cause issues if you're using server-side rendering which expects both the server and client to agree on the same initially rendered content. Please see the deferred hook below.
 
