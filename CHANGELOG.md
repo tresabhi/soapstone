@@ -1,5 +1,11 @@
 # soapstone
 
+## 1.2.0
+
+### Minor Changes
+
+- 15cbdbb: Add an `override` argument to `useInitialization` that reinitializes the store even if it was already initialized
+
 ## 1.1.0
 
 ### Minor Changes
